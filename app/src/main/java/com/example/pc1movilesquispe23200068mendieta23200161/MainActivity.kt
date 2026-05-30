@@ -423,11 +423,11 @@ fun CatalogoDestinosScreen() {
     // 1. Simulación de la lista obligatoria con al menos 5 destinos de internet
     val destinos = remember {
         listOf(
-            Destination(1, "Francia", "París", 150.0, "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500"),
-            Destination(2, "Japón", "Tokio", 180.5, "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=500"),
+            Destination(1, "Francia", "París", 150.0, "https://cdn2.civitatis.com/francia/paris/galeria/torre-eiffel-altura.jpg"),
+            Destination(2, "Japón", "Tokio", 180.5, "https://www.transitours.com/blog/wp-content/uploads/2025/06/que-ver-en-tokio.jpg"),
             Destination(3, "Italia", "Roma", 125.0, "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=500"),
-            Destination(4, "Perú", "Cusco", 95.5, "https://images.unsplash.com/photo-1587547178031-84c407850814?w=500"),
-            Destination(5, "Estados Unidos", "Nueva York", 210.0, "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=500")
+            Destination(4, "Perú", "Cusco", 95.5, "https://cuscoperu.b-cdn.net/wp-content/uploads/2025/12/machu-picchu-cusco-peru.webp"),
+            Destination(5, "Estados Unidos", "Nueva York", 210.0, "https://losapuntesdelviajero.com/wp-content/uploads/2014/04/Lugares-que-ver-en-Nueva-York-EEUU.jpg")
         )
     }
 
