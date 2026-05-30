@@ -55,4 +55,10 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // 🟢 NUEVAS DEPENDENCIAS AGREGADAS PARA LA PRÁCTICA:
+    // Navegación entre las pantallas (Pantalla 0)
+    implementation("androidx.navigation:navigation-compose:2.8.5")
+
+    // Coil para cargar imágenes desde URLs de internet (Pantalla 3)
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
