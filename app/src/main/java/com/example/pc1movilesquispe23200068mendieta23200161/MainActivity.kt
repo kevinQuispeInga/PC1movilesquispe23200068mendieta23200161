@@ -13,7 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -38,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -45,10 +49,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 
-// ==========================================
-// ACTIVIDAD PRINCIPAL (PUNTO DE ENTRADA)
-// ==========================================
+/**
+ * Actividad principal de la aplicación que sirve como punto de entrada.
+ * Configura el tema y el sistema de navegación.
+ */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,9 +72,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-// ==========================================
-// ENRUTADOR PRINCIPAL (NAVHOST)
-// ==========================================
+/**
+ * Define el NavHost y las rutas de navegación para la aplicación.
+ */
 @Composable
 fun TravelAppNavigation() {
     val navController = rememberNavController()
@@ -92,12 +98,12 @@ fun TravelAppNavigation() {
             PlanificadorPresupuestoScreen()
         }
 
-        // Contenedores temporales restantes
+        // PANTALLA 3: Catálogo de Destinos Turísticos
         composable(Screen.Catalogo.route) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Pantalla 3: Catálogo de Destinos")
-            }
+            CatalogoDestinosScreen()
         }
+
+        // Contenedor temporal restante
         composable(Screen.Permisos.route) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text("Pantalla 4: Permiso de Ubicación")
@@ -106,9 +112,10 @@ fun TravelAppNavigation() {
     }
 }
 
-// ==========================================
-// PANTALLA 0: MENÚ PRINCIPAL
-// ==========================================
+/**
+ * Pantalla del Menú Principal que ofrece accesos directos a las distintas funcionalidades.
+ * @param navController Controlador de navegación para redirigir al usuario.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuScreen(navController: NavController) {
@@ -165,9 +172,11 @@ fun MenuScreen(navController: NavController) {
     }
 }
 
-// ==========================================
-// PANTALLA 1: CALCULADORA DE EQUIPAJE
-// ==========================================
+/**
+ * Pantalla de la Calculadora de Equipaje.
+ * Permite al usuario verificar si su maleta cumple con los límites de peso establecidos
+ * según el tipo de vuelo (Nacional o Internacional).
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculadoraEquipajeScreen() {
@@ -270,13 +279,14 @@ fun CalculadoraEquipajeScreen() {
     }
 }
 
-// ==========================================
-// PANTALLA 2: PLANIFICADOR DE PRESUPUESTO (4 PTS)
-// ==========================================
+/**
+ * Pantalla del Planificador de Presupuesto.
+ * Calcula el presupuesto total de un viaje basándose en los días, presupuesto diario
+ * y el factor del tipo de alojamiento seleccionado.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanificadorPresupuestoScreen() {
-    // Estados para inputs y lógica
     var diasInput by remember { mutableStateOf("") }
     var presupuestoDiarioInput by remember { mutableStateOf("") }
     var tipoAlojamiento by remember { mutableStateOf("Estándar") }
@@ -284,7 +294,6 @@ fun PlanificadorPresupuestoScreen() {
     var totalResultado by remember { mutableStateOf("") }
     var errorMsg by remember { mutableStateOf("") }
 
-    // Control del Menú Desplegable
     var menuExpandido by remember { mutableStateOf(false) }
     val opcionesAlojamiento = listOf("Económico (0.8)", "Estándar (1.0)", "Premium (1.5)")
 
@@ -306,7 +315,6 @@ fun PlanificadorPresupuestoScreen() {
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            // Campo 1: Cantidad de Días
             OutlinedTextField(
                 value = diasInput,
                 onValueChange = { diasInput = it },
@@ -317,7 +325,6 @@ fun PlanificadorPresupuestoScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campo 2: Presupuesto Diario
             OutlinedTextField(
                 value = presupuestoDiarioInput,
                 onValueChange = { presupuestoDiarioInput = it },
@@ -327,14 +334,8 @@ fun PlanificadorPresupuestoScreen() {
             )
 
             Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Tipo de alojamiento:", fontWeight = FontWeight.SemiBold, modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp))
 
-            Text(
-                text = "Tipo de alojamiento:",
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp)
-            )
-
-            // Campo 3: Dropdown Menu oficial de Material 3
             ExposedDropdownMenuBox(
                 expanded = menuExpandido,
                 onExpandedChange = { menuExpandido = !menuExpandido }
@@ -368,25 +369,16 @@ fun PlanificadorPresupuestoScreen() {
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            // Mostrar errores de validación
             if (errorMsg.isNotEmpty()) {
-                Text(
-                    text = errorMsg,
-                    color = Color.Red,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Text(text = errorMsg, color = Color.Red, style = MaterialTheme.typography.bodySmall, modifier = Modifier.fillMaxWidth())
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // Botón Calcular
             Button(
                 onClick = {
                     val dias = diasInput.toIntOrNull()
                     val presupuesto = presupuestoDiarioInput.toDoubleOrNull()
 
-                    // Validaciones estrictas de la rúbrica
                     if (diasInput.isBlank() || presupuestoDiarioInput.isBlank()) {
                         errorMsg = "Todos los campos son obligatorios."
                         totalResultado = ""
@@ -397,11 +389,8 @@ fun PlanificadorPresupuestoScreen() {
                         errorMsg = "El presupuesto diario debe ser un valor numérico mayor a cero."
                         totalResultado = ""
                     } else {
-                        // Limpieza y cálculo
                         errorMsg = ""
                         val total = dias * presupuesto * factorAlojamiento
-
-                        // Resultado formateado a dos decimales con mensaje descriptivo
                         totalResultado = "💰 Presupuesto Total: $${String.format("%.2f", total)}\n\nEscenario: Viaje planificado para un periodo de $dias días, con un presupuesto asignado por día de $$presupuesto y un hospedaje de categoría $tipoAlojamiento."
                     }
                 },
@@ -412,18 +401,132 @@ fun PlanificadorPresupuestoScreen() {
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-
-            // Tarjeta con el mensaje final obtenido
             if (totalResultado.isNotEmpty()) {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
-                    Text(
-                        text = totalResultado,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(16.dp)
-                    )
+                    Text(text = totalResultado, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(16.dp))
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Pantalla del Catálogo de Destinos Turísticos.
+ * Muestra una lista de destinos con imágenes cargadas asíncronamente y un resumen estadístico.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CatalogoDestinosScreen() {
+    // 1. Simulación de la lista obligatoria con al menos 5 destinos de internet
+    val destinos = remember {
+        listOf(
+            Destination(1, "Francia", "París", 150.0, "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=500"),
+            Destination(2, "Japón", "Tokio", 180.5, "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=500"),
+            Destination(3, "Italia", "Roma", 125.0, "https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=500"),
+            Destination(4, "Perú", "Cusco", 95.5, "https://images.unsplash.com/photo-1587547178031-84c407850814?w=500"),
+            Destination(5, "Estados Unidos", "Nueva York", 210.0, "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=500")
+        )
+    }
+
+    // Cálculos de resumen requeridos
+    val cantidadTotal = destinos.size
+    val costoAcumulado = destinos.sumOf { it.costoPromedio }
+
+    Scaffold(
+        topBar = { TopAppBar(title = { Text("Catálogo de Destinos") }) }
+    ) { paddingValues ->
+        // Utilización estructurada de LazyColumn
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                Text(
+                    text = "Destinos Recomendados",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            }
+
+            // Mapeo dinámico de los elementos en el LazyColumn
+            items(destinos) { destino ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                ) {
+                    // Distribución Row para colocar la imagen a la izquierda y texto a la derecha
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Carga asíncrona de Coil con AsyncImage
+                        AsyncImage(
+                            model = destino.urlImagen,
+                            contentDescription = "Imagen de ${destino.ciudad}",
+                            modifier = Modifier
+                                .size(90.dp)
+                                .padding(end = 12.dp),
+                            contentScale = ContentScale.Crop
+                        )
+
+                        // Column interna para los textos del destino
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "${destino.ciudad}, ${destino.pais}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Costo promedio: $${destino.costoPromedio} por día",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = Color.Gray
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Bloque final con el totalizador acumulado requerido
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "📊 Resumen del Catálogo",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        Text(
+                            text = "Cantidad total de destinos: $cantidadTotal",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = "Suma acumulada de costos: $${String.format("%.2f", costoAcumulado)}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
