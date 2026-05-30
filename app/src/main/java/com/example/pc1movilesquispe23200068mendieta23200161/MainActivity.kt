@@ -50,6 +50,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
 
 /**
  * Actividad principal de la aplicación que sirve como punto de entrada.
@@ -105,9 +111,7 @@ fun TravelAppNavigation() {
 
         // Contenedor temporal restante
         composable(Screen.Permisos.route) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Pantalla 4: Permiso de Ubicación")
-            }
+            PermisoUbicacionScreen()
         }
     }
 }
@@ -531,4 +535,115 @@ fun CatalogoDestinosScreen() {
             }
         }
     }
+}
+
+
+// ==========================================
+// PANTALLA 4: PERMISO DE UBICACIÓN PARA ASISTENCIA DE VIAJE (2 PTS)
+// ==========================================
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PermisoUbicacionScreen() {
+
+
+    val context = LocalContext.current
+
+    var estadoPermiso by remember {
+        mutableStateOf("Permiso pendiente de solicitud")
+    }
+
+    val launcherPermiso = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { concedido ->
+
+        estadoPermiso =
+            if (concedido) {
+                "Permiso concedido"
+            } else {
+                "Permiso denegado"
+            }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Permiso de Ubicación")
+                }
+            )
+        }
+    ) { paddingValues ->
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(24.dp),
+
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+            Text(
+                text = "Asistencia de Viaje",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = "Esta pantalla solicita permiso de ubicación para brindar asistencia durante el viaje.",
+                style = MaterialTheme.typography.bodyLarge
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+
+                Text(
+                    text = estadoPermiso,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Button(
+                onClick = {
+
+                    val permisoActual = ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    )
+
+                    if (permisoActual == PackageManager.PERMISSION_GRANTED) {
+
+                        estadoPermiso = "Permiso concedido"
+
+                    } else {
+
+                        launcherPermiso.launch(
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red
+                )
+            ) {
+                Text("Solicitar permiso de ubicación")
+            }
+        }
+    }
+
+
 }
